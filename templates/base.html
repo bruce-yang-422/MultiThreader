@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}MultiThreader 多脆客{% endblock %}</title>
+  <link rel="stylesheet" href="{{ asset_url('app.css') }}">
+  <script src="{{ asset_url('app.js') }}" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('web.compose') }}"><span class="brandmark">M</span><span>多脆客<small>MultiThreader</small></span></a>
+    {% if current_user.is_authenticated %}
+    <nav aria-label="主要導覽">
+      <a href="{{ url_for('web.compose') }}" {% if request.endpoint=='web.compose' %}aria-current="page"{% endif %}>撰寫貼文</a>
+      <a href="{{ url_for('web.accounts') }}" {% if request.endpoint=='web.accounts' %}aria-current="page"{% endif %}>Threads 發文帳號</a>
+      {% if current_user.is_admin %}<a href="{{ url_for('web.users') }}" {% if request.endpoint in ('web.users','web.reset_user_password','web.delete_user') %}aria-current="page"{% endif %}>同事登入帳號</a>{% endif %}
+      <a href="{{ url_for('web.history') }}" {% if request.endpoint in ('web.history','web.batch_page') %}aria-current="page"{% endif %}>發文紀錄</a>
+    </nav>
+    <form action="{{ url_for('web.logout') }}" method="post" class="usernav"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><a href="{{ url_for('web.password') }}">{{ current_user.username }}</a><button class="linkbutton">登出</button></form>
+    {% endif %}
+  </header>
+  {% if mode=='demo' %}<div class="modebanner"><strong>模擬模式</strong>　使用測試帳號，所有發布均不會送到 Threads。</div>{% endif %}
+  <main class="max-w-6xl mx-auto px-5 py-8 md:px-8">
+    {% for category,message in get_flashed_messages(with_categories=true) %}<div class="notice {{ category }}" role="status">{{ message }}</div>{% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <div id="toast" class="toast" role="status" hidden></div>
+  <footer>MultiThreader 多脆客 · 讓每個帳號，好好發聲。</footer>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel max-w-lg mx-auto">
+  <p class="eyebrow">TEAM ACCOUNT</p>
+  <h1>{{ '重設密碼' if action=='password' else '刪除同事帳號' }}</h1>
+  <p class="muted my-5">登入帳號：<strong>{{ user.username }}</strong></p>
+  <form method="post" class="space-y-5">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {% if action=='password' %}
+    <p class="muted">重設後，這位同事需使用新密碼重新登入。原有 Threads 操作權限保持不變。</p>
+    <label class="field">新密碼<input type="password" name="new_password" minlength="12" required autocomplete="new-password"></label>
+    <label class="field">確認新密碼<input type="password" name="confirm_password" minlength="12" required autocomplete="new-password"></label>
+    <button class="primary">確認重設密碼</button>
+    {% else %}
+    <div class="notice">刪除後將立即停用這位同事的登入與 Threads 操作權限，並停止尚未開始的發布工作。歷史紀錄保留；已送到平台的發布可能仍會完成。</div>
+    <label class="field">輸入完整登入帳號以確認<input name="confirm_username" required autocomplete="off" placeholder="{{ user.username }}"></label>
+    <button class="secondary danger">確認刪除帳號</button>
+    {% endif %}
+    <a class="linkbutton" href="{{ url_for('web.users') }}">取消，返回同事登入帳號</a>
+  </form>
+</section>
+{% endblock %}

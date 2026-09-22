@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="pageheading"><div><p class="eyebrow">CONNECTED ACCOUNTS</p><h1>Threads 發文帳號</h1><p class="muted">連結 Threads 帳號、管理授權與指派發文權限。</p></div>
+{% if current_user.is_admin %}<form action="{{ url_for('web.connect') }}" method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="primary">＋ 連結 Threads 帳號</button></form>{% endif %}</div>
+{% if mode=='live' and not configured %}<div class="notice">Meta App 尚未設定完成。請依專案中的「設定指南.md」填入 App ID、Secret 與 HTTPS 回呼網址。</div>{% endif %}
+<section aria-labelledby="threads-heading">
+<h2 id="threads-heading" class="mb-2">Threads 發文帳號</h2>
+<p class="muted mb-5">點「連結 Threads 帳號」，到官方頁面完成授權後，帳號會顯示在這裡。</p>
+<div class="grid md:grid-cols-2 gap-5">
+{% for account in accounts %}<article class="panel">
+<div class="flex items-center gap-4 mb-5">{% if account.avatar %}<img class="avatar" src="{{ account.avatar }}" alt="">{% else %}<span class="avatar avatar-placeholder">{{ account.label[:1] }}</span>{% endif %}<div><h2>{{ account.label }}</h2><p class="muted">@{{ account.username }}</p></div><span class="badge ml-auto">{{ '已連結' if account.status=='connected' else '需要連結' }}</span></div>
+<p class="fineprint">Threads ID：{{ account.external_id }}</p><p class="fineprint">授權到期：<time data-timestamp="{{ account.expires_at }}"></time></p>
+{% if current_user.is_admin %}
+<form action="{{ url_for('web.update_account', account_id=account.id) }}" method="post" class="mt-5 space-y-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label class="field">帳號別名<input name="label" value="{{ account.label }}" required maxlength="80"></label>
+  <fieldset><legend class="field">可操作的編輯</legend><p class="fineprint">管理者可操作所有帳號。</p>{% for user in users if not user.is_admin %}<label class="checklabel"><input type="checkbox" name="members" value="{{ user.id }}" {% if (user.id,account.id) in members %}checked{% endif %}>{{ user.username }}</label>{% else %}<p class="muted">尚未新增編輯。請至<a href="{{ url_for('web.users') }}">同事登入帳號</a>新增。</p>{% endfor %}</fieldset>
+  <button class="secondary" name="action" value="save">儲存設定</button><button class="linkbutton danger" name="action" value="disconnect" data-confirm="解除連結後將停止待發布工作，確定繼續？">解除連結</button>
+</form>
+{% if mode=='live' %}<form action="{{ url_for('web.connect') }}" method="post" class="mt-4"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><input type="hidden" name="external_id" value="{{ account.external_id }}"><button class="linkbutton">重新授權此帳號</button> <button class="secondary" name="enable_replies" value="1">授權第一則回覆</button><p class="fineprint">首次使用回覆前，請先在 Meta App 啟用 threads_manage_replies，再按「授權第一則回覆」。</p></form>{% endif %}
+{% endif %}</article>{% else %}<div class="panel"><h2>尚未連結 Threads 帳號</h2><p class="muted mt-3">{% if current_user.is_admin %}請按右上方「連結 Threads 帳號」開始官方授權。{% else %}請管理者連結 Threads 帳號並指派給你。{% endif %}</p></div>{% endfor %}
+</div>
+</section>
+{% endblock %}

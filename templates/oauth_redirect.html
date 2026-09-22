@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="panel max-w-lg mx-auto" id="oauth-redirect">
+  <p class="eyebrow">CONNECT THREADS</p>
+  <h1>正在開啟 Threads 官方授權</h1>
+  <p class="muted my-5">請在官方頁面確認要連結的 Threads 帳號，並同意授權。完成後會回到多脆客確認帳號。</p>
+  <a id="oauth-link" class="primary" href="{{ authorization_url }}" rel="noreferrer">前往 Threads 授權 →</a>
+  <p class="fineprint">若沒有自動跳轉，請點上方按鈕。</p>
+  <a class="linkbutton inline-block mt-5" href="{{ url_for('web.accounts') }}">返回帳號管理</a>
+</section>
+{% endblock %}

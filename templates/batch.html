@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}
+<div id="batch" data-id="{{ batch_id }}"><div class="pageheading"><div><p class="eyebrow">BATCH RESULTS</p><h1>這次發布的結果</h1><p class="muted" id="batch-summary">正在讀取……</p></div><a class="secondary" href="{{ url_for('web.history') }}">返回紀錄</a></div><div id="worker-notice" class="notice" hidden>發布程序尚未就緒，工作已保存。請啟動 <code>python worker.py</code>；已提交的內容無須重送。</div><div id="batch-error" class="notice error" hidden></div><div id="job-results" class="grid md:grid-cols-2 gap-5"></div></div>
+{% endblock %}

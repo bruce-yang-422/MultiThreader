@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="login-grid">
+  <div><p class="eyebrow">YOUR BRANDS, ONE WORKSPACE</p><h1>多個帳號，<br>一處完成。</h1><p class="lead">把時間留給內容。<br>連結 Threads、整理圖文，輕鬆發布到對的帳號。</p><div class="flowpill">撰寫圖文 <span>→</span> 選擇帳號 <span>→</span> 一次發布</div></div>
+  <form class="panel space-y-5" method="post">
+    <h2>登入工作空間</h2><p class="muted">使用公司的多脆客內部帳號。</p>
+    {% if has_users is defined and not has_users %}<div class="notice">尚未建立管理者。請先在終端執行 <code>python manage.py init</code>。</div>{% endif %}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="field">帳號<input name="username" autocomplete="username" required maxlength="80" autofocus></label>
+    <label class="field">密碼<input name="password" type="password" autocomplete="current-password" required></label>
+    <button class="primary w-full">登入</button>
+  </form>
+</section>
+{% endblock %}

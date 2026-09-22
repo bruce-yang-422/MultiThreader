@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div id="compose" data-accounts="{{ accounts|tojson|forceescape }}">
+  <div class="pageheading"><div><p class="eyebrow">THREADS WORKSPACE</p><h1>今天，想分享什麼？</h1><p class="muted">準備好圖文，讓每個帳號都收到正確的內容。</p></div><span class="badge">Threads · 即時發布</span></div>
+  {% if not accounts %}<div class="notice">還沒有可操作的帳號。請至「帳號管理」連結帳號，或請管理者指派權限。</div>{% endif %}
+  <div class="modecards" role="group" aria-label="發布模式">
+    <label class="modecard"><input type="radio" name="mode" value="same" checked><span><strong>同篇多帳號</strong><small>一篇圖文，同時發往 A／B／C</small></span><span class="modeicon">↗</span></label>
+    <label class="modecard"><input type="radio" name="mode" value="different"><span><strong>不同篇指定帳號</strong><small>圖文甲 → A，圖文乙 → B</small></span><span class="modeicon">⇄</span></label>
+  </div>
+  <div class="workspace"><section><div id="cards" class="space-y-5"></div><button id="add-card" class="secondary mt-4" hidden>＋ 新增一張圖文</button></section>
+    <aside class="panel summary"><p class="eyebrow">PUBLISH OVERVIEW</p><h2>發布概覽</h2><div class="summary-number"><span id="target-count">0</span><small>份貼文</small></div><p class="muted">確認內容與目標帳號後，再整批發布。</p><hr><p id="draft-status" class="muted">草稿尚未儲存</p><button id="save-draft" class="secondary w-full">儲存草稿</button><button id="preview" class="primary w-full mt-3">預覽並確認 →</button><button id="new-draft" class="linkbutton mt-4">清空並開始新草稿</button><p class="fineprint">各帳號分別發布，完成時間可能有先後。</p></aside>
+  </div>
+</div>
+<template id="card-template">
+  <article class="panel post-card">
+    <div class="flex items-center justify-between mb-5"><h2 class="card-title"></h2><button type="button" class="linkbutton remove-card">移除</button></div>
+    <label class="field">貼文內容<textarea rows="6" class="post-text" placeholder="寫下想分享的消息……"></textarea></label><p class="char-count fineprint text-right"></p>
+    <div class="image-upload"><label class="field">圖片／影片 <span class="muted">選填・最多 20 張圖片或一支影片</span><input class="post-image" type="file" multiple accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,.mov"></label><p class="fineprint">可分次加入圖片，依下方順序發布。每張圖片限 8 MB；影片限 90 MB、5 分鐘，MP4／MOV（H.264／H.265＋AAC）。</p><div class="media-list grid md:grid-cols-2 gap-3 mt-3"></div></div>
+    <label class="field mt-5">第一則回覆（選填）<textarea class="first-reply" rows="3" placeholder="主貼文成功後，由同一帳號自動回覆，最多 500 字元。"></textarea></label><p class="reply-count fineprint text-right"></p>
+    <fieldset class="mt-5"><legend class="mb-3 font-semibold">發布到哪些帳號？</legend><div class="account-options"></div></fieldset>
+  </article>
+</template>
+<dialog id="preview-dialog"><div class="dialog-body"><div class="flex justify-between items-center"><h2>確認這次發布</h2><button class="linkbutton" id="close-preview">返回編輯</button></div><p class="muted mt-3">請核對每篇圖文與目標帳號。</p><div id="preview-content" class="space-y-4 my-5"></div><p id="publish-error" class="notice error" hidden></p><button id="publish" class="primary w-full">確認整批發布</button></div></dialog>
+{% endblock %}

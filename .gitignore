@@ -1,0 +1,30 @@
+.venv/
+.env
+帳號密碼.md
+instance/
+__pycache__/
+*.pyc
+node_modules/
+test-results/
+tools/cloudflared.exe
+tools/tunnel.log
+.pytest_cache/
+
+# Local inventory tools and reference checkout
+/project_tree_structure_generator.py
+/project_tree_structure.txt
+/Insights/
+# Generated artifacts and local configuration
+.env.*
+!.env.example
+*.log
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+playwright-report/
+.coverage
+htmlcov/
+.ruff_cache/
+*.tmp
+*.bak

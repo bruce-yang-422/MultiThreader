@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block content %}
+<section class="panel max-w-lg mx-auto">
+<h1>{{ '刪除此筆紀錄' if batch_id else '清空發文紀錄' }}</h1>
+<p class="muted my-5">{{ '將刪除這一批的各帳號發文結果。' if batch_id else ('將清空所有人的已完成發文紀錄。' if current_user.is_admin else '將清空你自己的已完成發文紀錄。') }}刪除後無法還原，Threads 上已發布的貼文會保留。</p>
+<p class="notice">待發布、處理中及待確認的紀錄會保留，請先完成發布或查核。</p>
+<form method="post" class="mt-5"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="secondary danger">{{ '確認刪除' if batch_id else '確認清空紀錄' }}</button> <a class="linkbutton" href="{{ url_for('web.history') }}">取消</a></form>
+</section>{% endblock %}

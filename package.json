@@ -1,0 +1,12 @@
+{
+  "name": "multithreader-ui",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./static/input.css -o ./static/app.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "*",
+    "tailwindcss": "*",
+    "@playwright/test": "*"
+  }
+}
