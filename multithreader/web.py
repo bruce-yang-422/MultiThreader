@@ -435,6 +435,9 @@ def submit_batch():
     # Stable hash of submitted user data, not mutable account/asset state.
     digest = hashlib.sha256(json.dumps({'mode': data.get('mode'), 'cards': data.get('cards')}, sort_keys=True).encode()).hexdigest()
     with transaction() as conn:
+        from .control import draining
+        if draining(conn):
+            return jsonify(error='服務正在停止，請稍後再發布；草稿仍可保存。'), 503
         prior = conn.execute('SELECT * FROM batches WHERE user_id=? AND request_key=?', (current_user.id, key)).fetchone()
         if prior:
             if prior['payload_hash'] != digest:
@@ -519,6 +522,9 @@ def batch_data(batch_id):
 @login_required
 def retry(job_id):
     with transaction() as conn:
+        from .control import draining
+        if draining(conn):
+            return jsonify(error='服務正在停止，請稍後再重試。'), 503
         job = conn.execute('SELECT * FROM jobs WHERE id=?', (job_id,)).fetchone()
         if not job:
             abort(404)
@@ -537,6 +543,9 @@ def retry(job_id):
 @login_required
 def reply_action(job_id, action):
     with transaction() as conn:
+        from .control import draining
+        if action == 'retry' and draining(conn):
+            return jsonify(error='服務正在停止，請稍後再重試。'), 503
         job = conn.execute('SELECT * FROM jobs WHERE id=?', (job_id,)).fetchone()
         if not job:
             abort(404)

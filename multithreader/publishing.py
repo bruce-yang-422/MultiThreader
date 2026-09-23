@@ -5,6 +5,7 @@ from cryptography.fernet import InvalidToken
 from flask import current_app
 
 from .db import get_db, transaction
+from .control import draining
 from .threads import APIError, ThreadsAPI
 
 
@@ -46,6 +47,8 @@ def refresh_due_accounts():
 def claim_job():
     now = time.time()
     with transaction() as conn:
+        if draining(conn):
+            return None
         conn.execute("INSERT OR REPLACE INTO runtime VALUES ('heartbeat',?)", (now,))
         # A crashed process may already have sent the publish request. Never resend automatically.
         conn.execute("""UPDATE jobs SET status='uncertain',error='處理中斷，請先查核平台結果。',updated_at=?
@@ -168,6 +171,8 @@ def wait_ready(api, token, container, job_id, reply=False):
 def claim_reply():
     now = time.time()
     with transaction() as conn:
+        if draining(conn):
+            return None
         conn.execute("UPDATE jobs SET reply_status='uncertain',reply_error='回覆處理中斷，請查核後再操作。',updated_at=? WHERE reply_status='processing' AND updated_at<?", (now, now - 600))
         row = conn.execute("SELECT * FROM jobs WHERE status='success' AND reply_status='pending' ORDER BY updated_at,id LIMIT 1").fetchone()
         if not row:

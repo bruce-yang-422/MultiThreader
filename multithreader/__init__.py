@@ -81,6 +81,15 @@ def create_app(overrides=None):
     from .web import bp
     app.register_blueprint(bp)
 
+    @app.get('/healthz')
+    def health():
+        from .control import status
+        state = status()
+        # Public response contains no account, settings, or process metadata.
+        return jsonify(application=state['application'], protocol=1,
+                       instance=os.getenv('MULTITHREADER_INSTANCE', ''),
+                       ready=not state['draining'], worker_online=state['worker_online'])
+
     @app.errorhandler(CSRFError)
     def csrf_error(error):
         if request.path.startswith('/api/'):

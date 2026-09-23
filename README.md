@@ -39,11 +39,23 @@ python app.py
 python worker.py
 ```
 
-未啟用 HTTPS 時，開啟 http://127.0.0.1:18473 。使用 HTTPS 時，改開 `instance/https-url.txt` 中的網址。也可執行 `./Start.ps1`，它會檢查初始化、啟動背景 worker 與網頁；結束腳本時停止該 worker。
+未啟用 HTTPS 時，開啟 http://127.0.0.1:18473 。使用 HTTPS 時，改開 `instance/https-url.txt` 中的網址。日常可使用桌面「MultiThreader 控制台」，或執行 `./Start.ps1` 啟動背景網頁與 worker；關閉控制台或終端不會停止服務，請用 `./Stop.ps1` 安全停止。
 
 本次工作若已產生初始帳號，登入資料在 `instance/initial-login.txt`；登入後點右上角帳號名稱更改密碼，並刪除初始登入檔。不要將該檔、`instance/`、`.env` 或 `帳號密碼.md` 上傳到 Git。
 
-本次若服務已在背景啟動，可直接使用 `instance/https-url.txt` 的網址。要切換設定或自行重啟，先執行 `./Stop.ps1` 停止本次記錄的背景程序，再依指南啟動。之後自行在終端啟動的程序以 Ctrl+C 結束。
+本次若服務已在背景啟動，可直接使用 `instance/https-url.txt` 的網址。控制台只停止由新共用模組記錄且身分相符的程序。舊版腳本或自行在終端啟動的程序，請先確認沒有發布工作，再由原啟動方式結束；控制台不會接管或強制結束未知程序。
+
+## 桌面控制台
+
+完成 `.env`、Python 套件與 `python manage.py init` 後，執行 `./Install-ControlPanel.ps1` 建立桌面捷徑。日常雙擊「MultiThreader 控制台」即可啟動、停止、重啟、開啟網站或查看不含憑證的操作紀錄與詳細狀態。控制台固定檢查 `127.0.0.1:18473` 與 `https://multithreader.stack-base.com`，要求 `HOST=127.0.0.1`、`PORT=18473`（未填則使用預設）。首次初始化不會在日常啟動時要求輸入帳密。
+
+停止時暫停新發布及重試，worker 完成已領取的發布／回覆後自行退出；預設等待 120 秒，逾時保留程序與停止狀態。可按「取消停止」，再按「全部啟動」補起已退出的 worker。命令列相同操作為 `./Stop.ps1 -Cancel` 與 `./Start.ps1`。遇到先前中斷、仍標示處理中的工作，保留服務供查核，不強制結束。資料庫、草稿、token 與待發布工作均保留。
+
+**Cloudflared 預設僅監看，排除於啟停範圍。** 管理者確認 `Cloudflared` 的 Tunnel `f0c5c608-6c46-4903-b75b-7f9fb3f4dd4e` 只服務本工具後，才執行 `./Install-ControlPanel.ps1 -DedicatedTunnelConfirmed`。安裝程式驗證服務 token 中的 Tunnel ID，只保存命令雜湊，不保存 token；無法驗證則拒絕啟用。日常使用者須已獲授該服務的啟停權限，否則顯示首次設定提示，不提升整個控制台、網頁或 worker 的權限。遠端 Tunnel 路由變更後，管理者應重新確認是否仍專用。
+
+`instance/control.log` 為安全操作摘要，超過 1 MB 保留上一份；網頁及 worker 的輸出於每次啟動保留上一份。問題紀錄視窗只顯示操作摘要與必要狀態，不直接展示可能含敏感資訊的原始程序輸出。`instance/control-processes.json` 保存 PID、建立時間、執行路徑及命令列；啟停以互斥鎖與檔案鎖防止重複操作。健康檢查 `/healthz` 不回傳帳號或設定。
+
+控制台驗證：`powershell.exe -NoProfile -STA -File ./ControlPanel.ps1 -SmokeTest`；隔離 demo 啟停驗收：`powershell.exe -NoProfile -File tests/control_lifecycle.ps1`（使用暫存資料與 19473，不操作正式 Cloudflared）。
 
 ## 模擬驗收
 
